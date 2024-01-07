@@ -1,25 +1,26 @@
 class Solution {
     public int numberOfArithmeticSlices(int[] nums) {
-        int ans = 0;
-        int len = nums.length;
-        Map<Integer, Integer>[] map = new Map[len];
+        final int n = nums.length;
+    int ans = 0;
+    // dp[i][j] := the number of subsequences end in nums[j] nums[i]
+    int[][] dp = new int[n][n];
+    Map<Long, List<Integer>> numToIndices = new HashMap<>();
 
-        for (int i = 0; i < len; i++) {
-            map[i] = new HashMap<>(i);
+    for (int i = 0; i < n; ++i) {
+      numToIndices.putIfAbsent((long) nums[i], new ArrayList<>());
+      numToIndices.get((long) nums[i]).add(i);
+    }
 
-            for (int j = 0; j < i; j++) {
-                long diff = (long)(nums[j]) - nums[i];
-                if (diff <= Integer.MIN_VALUE || diff > Integer.MAX_VALUE) continue;
+    for (int i = 0; i < n; ++i)
+      for (int j = 0; j < i; ++j) {
+        final long target = nums[j] * 2L - nums[i];
+        if (numToIndices.containsKey(target))
+          for (final int k : numToIndices.get(target))
+            if (k < j)
+              dp[i][j] += (dp[j][k] + 1);
+        ans += dp[i][j];
+      }
 
-                int dif = (int)diff;
-                int n2 = map[i].getOrDefault(dif, 0);
-                int n1 = map[j].getOrDefault(dif, 0);
-                ans += n1;
-                int freq = n1 + n2 +1;
-                map[i].put(dif, freq);
-            }
-        }
-
-        return ans;
+    return ans;
     }
 }
