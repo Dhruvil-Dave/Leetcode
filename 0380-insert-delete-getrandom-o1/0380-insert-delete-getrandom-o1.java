@@ -1,43 +1,35 @@
 class RandomizedSet {
+  public boolean insert(int val) {
+    if (valToIndex.containsKey(val))
+      return false;
+    valToIndex.put(val, vals.size());
+    vals.add(val);
+    return true;
+  }
 
-   HashMap<Integer, Integer> hm;
-    List<Integer> list;
-   
-    public RandomizedSet() {
-        hm = new HashMap<>();
-        list = new ArrayList<>();
-    }
-      
-    public boolean insert(int val) {
-        if(hm.containsKey(val)) return false;
-        list.add(val);
-        hm.put(val,list.size()-1);
-        return true;
-    }
-    
-    public boolean remove(int val) {
-        if(hm.containsKey(val) == false)
-            return false;
-        int ind = hm.get(val);
-        Collections.swap(list,ind,list.size()-1);
-        int swappedWith = list.get(ind);
-        hm.put(swappedWith,ind);
-        list.remove(list.size()-1);
-        hm.remove(val);
-        return true;
-    }
-    
-    public int getRandom() {
-        Random random = new Random();
-        int n = random.nextInt(list.size());
-        return list.get(n);
-    }
+  public boolean remove(int val) {
+    if (!valToIndex.containsKey(val))
+      return false;
+    final int index = valToIndex.get(val);
+    // The order of the following two lines is important when vals.size() == 1.
+    valToIndex.put(last(vals), index);
+    valToIndex.remove(val);
+    vals.set(index, last(vals));
+    vals.remove(vals.size() - 1);
+    return true;
+  }
+
+  public int getRandom() {
+    final int index = rand.nextInt(vals.size());
+    return vals.get(index);
+  }
+
+  // {val: index in vals}
+  private Map<Integer, Integer> valToIndex = new HashMap<>();
+  private List<Integer> vals = new ArrayList<>();
+  private Random rand = new Random();
+
+  private int last(List<Integer> vals) {
+    return vals.get(vals.size() - 1);
+  }
 }
-
-/**
- * Your RandomizedSet object will be instantiated and called as such:
- * RandomizedSet obj = new RandomizedSet();
- * boolean param_1 = obj.insert(val);
- * boolean param_2 = obj.remove(val);
- * int param_3 = obj.getRandom();
- */
